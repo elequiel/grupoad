@@ -1,41 +1,40 @@
-import os, shutil, subprocess
+import os
+import subprocess
 
 ### Cria o arquivo de pesquisa
-def pesquisa():
+def pesquisar():
     nif = input('Informe o NIF da pessoa: ')
     comando = ('Import-Module activedirectory \n')
-    comando1 = ('(Get-ADUser -Identity ' +nif+ ' -Properties MemberOf | Select-Object MemberOf).MemberOf > C:\\temp\\user.txt')
+    comando1 = ('(Get-ADUser -Identity ' + nif + ' -Properties MemberOf | Select-Object MemberOf).MemberOf > C:\\temp\\user.txt')
     with open('C:\\temp\\user.ps1', 'w', newline="\n", encoding='utf8') as dados:
         dados.write(comando)
         dados.write(comando1)
 
 ### Lê o arquivo .txt que esta na pasta temp
 def ler():
-    global conteudo
-    lerArquivo = open('C:\\temp\\user.txt', 'r', newline="\n", encoding='utf16')
-    conteudo = lerArquivo.readlines()
-    #print(conteudo)
-    print(len(conteudo))
-    lerArquivo.close()
+    global Conteudo
+    arquivo = open('C:\\temp\\user.txt', 'r', newline="\n", encoding='utf16')
+    conteudo = arquivo.readlines()
+    arquivo.close()
 
 ### Cria um novo arquivo .csv com os grupos separados
 def gravar():
-    global conteudo, conteudoMod
+    global Conteudo, ConteudoMod
 
-    for linha in range(len(conteudo)):
-        novaLinha = conteudo[linha].replace('=', '\t')
-        conteudoMod.append(novaLinha.replace(',', '\t'))
+    for linha in range(len(Conteudo)):
+        nova_linha = Conteudo[linha].replace('=', '\t')
+        ConteudoMod.append(nova_linha.replace(',', '\t'))
 
-    gravaNovoArquivo = open('C:\\temp\\novo.csv', 'w', newline='\n', encoding='utf16')
-    gravaNovoArquivo.writelines(conteudoMod)
-    gravaNovoArquivo.close()
+    gravar_novo_arquivo = open('C:\\temp\\novo.csv', 'w', newline='\n', encoding='utf16')
+    gravar_novo_arquivo.writelines(ConteudoMod)
+    gravar_novo_arquivo.close()
 
 ### Chama o PS pelo cmd
-def chamarPS():
+def powershell():
     subprocess.call(['powershell', '-Command', 'C:\\temp\\user.ps1'], shell = True)
 
 ### Chama o CSV pelo cmd
-def chamarCsv():
+def csv():
     subprocess.call(['start', 'C:\\temp\\novo.csv'], shell = True)
 
 ### Remove o arquivo anterior
@@ -44,11 +43,11 @@ if os.path.isfile('C:\\temp\\novo.csv'):
 
 
 ### MAIN
-conteudo = []
-conteudoMod = []
+Conteudo = []
+ConteudoMod = []
 
-pesquisa()
-chamarPS()
+pesquisar()
+powershell()
 ler()
 gravar()
-chamarCsv()
+csv()
